@@ -6,7 +6,7 @@ Example on how to use this with docker-compose
 version: '3.7'
 services:
   php:
-    image: php73fpm
+    image: mach25/php73fpm
     volumes:
       - ./html:/var/www/html:z
     networks:
