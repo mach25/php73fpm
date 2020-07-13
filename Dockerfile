@@ -1,4 +1,18 @@
+FROM php:7.3-fpm AS mhsendmail
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y \
+    apt-utils \
+    golang-go \
+    git \
+    && go get github.com/mailhog/mhsendmail \
+    && go build github.com/mailhog/mhsendmail
+
 FROM php:7.3-fpm
+
+# COPY mhsendmail from previous layer
+COPY --from=mhsendmail /build/mhsendmail /usr/bin/mhsendmail
 
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
@@ -24,4 +38,5 @@ RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 COPY ./phpconf/memory_limit.ini $PHP_INI_DIR/conf.d/memory_limit.ini
 COPY ./phpconf/opcache.ini $PHP_INI_DIR/conf.d/opcache.ini
 COPY ./phpconf/xdebug.ini $PHP_INI_DIR/conf.d/xdebug.ini
+COPY ./phpconf/sendmail.ini $PHP_INI_DIR/conf.d/sendmail.ini
 COPY ./phpconf/www.conf /usr/local/etc/php-fpm.d/www.conf
